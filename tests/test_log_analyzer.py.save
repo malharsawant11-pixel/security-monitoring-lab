@@ -1,0 +1,35 @@
+import csv
+from collections import Counter
+from pathlib import Path
+
+def analyze_logs(log_file, threshold=3):
+    failed_attempts = Counter()
+
+    with Path(log_file).open(
+        newline="", encoding="utf-8"
+    ) as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            if row.get("event_id") == "4625":
+                ip = row.get("sourceimport csv
+from collections import Counter
+from pathlib import Path
+
+def analyze_logs(log_file, threshold=3):
+    failed_attempts = Counter()
+
+    with Path(log_file).open(
+        newline="", encoding="utf-8"
+    ) as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            if row.get("event_id") == "4625":
+                ip = row.get("source   
+
+
+
+
+
+
