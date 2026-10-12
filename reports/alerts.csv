@@ -1,2 +1,2 @@
-source_ip,failed_attempts,status
-192.0.2.10,3,ALERT
+source_ip,failed_attempts,first_seen,last_seen,status
+192.0.2.10,3,2026-10-12T10:00:00,2026-10-12T10:00:10,ALERT

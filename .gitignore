@@ -1,1 +1,4 @@
-*.pcapng
+__pycache__/
+*.py[cod]
+*.bak
+*.save**.pcapng
