@@ -1,4 +1,4 @@
-
+from src.detection import detect_success_after_failures
 import tempfile
 import unittest
 from pathlib import Path
@@ -57,8 +57,58 @@ class TestLogAnalyzer(unittest.TestCase):
         )
         self.assertNotIn("192.0.2.10", result)
 
+    def test_success_after_three_failures_triggers_investigation(self):
+        self.write_logs([
+            ("2026-10-12T10:00:00", "192.0.2.10", "4625"),
+            ("2026-10-12T10:00:05", "192.0.2.10", "4625"),
+            ("2026-10-12T10:00:10", "192.0.2.10", "4625"),
+            ("2026-10-12T10:00:20", "192.0.2.10", "4624"),
+        ])
+
+        result = detect_success_after_failures(
+            self.log_file, threshold=3, window_minutes=5
+        )
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["source_ip"], "192.0.2.10")
+        self.assertEqual(result[0]["failed_attempts"], 3)
+        self.assertEqual(result[0]["status"], "INVESTIGATE")
+
+    def test_success_without_enough_failures_does_not_trigger(self):
+        self.write_logs([
+            ("2026-10-12T10:00:00", "192.0.2.10", "4625"),
+            ("2026-10-12T10:00:05", "192.0.2.10", "4625"),
+            ("2026-10-12T10:00:20", "192.0.2.10", "4624"),
+        ])
+
+        result = detect_success_after_failures(
+            self.log_file, threshold=3, window_minutes=5
+        )
+
+        self.assertEqual(result, [])
+
+    def test_failure_then_success_detection_workflow(self):
+        self.write_logs([
+            ("2026-10-12T10:00:00", "192.0.2.10", "4625"),
+            ("2026-10-12T10:00:05", "192.0.2.10", "4625"),
+            ("2026-10-12T10:00:10", "192.0.2.10", "4625"),
+            ("2026-10-12T10:00:20", "192.0.2.10", "4624"),
+        ])
+
+        failures = analyze_logs(
+            self.log_file, threshold=3, window_minutes=5
+        )
+        sequence = detect_success_after_failures(
+            self.log_file, threshold=3, window_minutes=5
+        )
+
+        self.assertIn("192.0.2.10", failures)
+        self.assertEqual(len(sequence), 1)
+        self.assertEqual(sequence[0]["status"], "INVESTIGATE")
+
 
 if __name__ == "__main__":
     unittest.main()
+
 
 

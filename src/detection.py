@@ -54,3 +54,57 @@ def analyze_logs(log_file, threshold=3, window_minutes=5):
                 break
 
     return alerts
+
+def detect_success_after_failures(
+    log_file, threshold=3, window_minutes=5
+):
+    """Detect successful logons after repeated failures from the same IP."""
+    events_by_ip = defaultdict(list)
+    window = timedelta(minutes=window_minutes)
+
+    with Path(log_file).open(
+        newline="", encoding="utf-8"
+    ) as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            event_id = row.get("event_id")
+            if event_id not in {"4624", "4625"}:
+                continue
+
+            ip = row.get("source_ip") or "unknown"
+
+            try:
+                timestamp = datetime.fromisoformat(row["timestamp"])
+            except (ValueError, KeyError, TypeError):
+                continue
+
+            events_by_ip[ip].append((timestamp, event_id))
+
+    alerts = []
+
+    for ip, events in events_by_ip.items():
+        events.sort(key=lambda event: event[0])
+
+        for index, (success_time, event_id) in enumerate(events):
+            if event_id != "4624":
+                continue
+
+            failures = [
+                timestamp
+                for timestamp, event in events[:index]
+                if event == "4625"
+                and timedelta(0) <= success_time - timestamp <= window
+            ]
+
+            if len(failures) >= threshold:
+                alerts.append({
+                    "source_ip": ip,
+                    "failed_attempts": len(failures),
+                    "success_time": success_time.isoformat(),
+                    "status": "INVESTIGATE",
+                    "rule": "SUCCESS_AFTER_REPEATED_FAILURES",
+                })
+                break
+
+    return alerts
