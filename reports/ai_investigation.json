@@ -1,0 +1,29 @@
+{
+  "summary": "An alert was triggered for source IP 192.0.2.10 following 3 failed attempts recorded over a 10-second window on 2026-10-12.",
+  "observed_facts": [
+    "Source IP address is 192.0.2.10.",
+    "A total of 3 failed attempts occurred.",
+    "The first attempt was observed at 2026-10-12T10:00:00.",
+    "The last attempt was observed at 2026-10-12T10:00:10.",
+    "The duration between the first and last attempt was 10 seconds.",
+    "The status is marked as ALERT."
+  ],
+  "possible_explanations": [
+    "A legitimate user or automated tool entered an incorrect password multiple times within a short duration.",
+    "An external or internal entity conducted low-volume credential guessing or authentication probing.",
+    "A misconfigured service or scheduled job attempted authentication using expired or invalid credentials."
+  ],
+  "recommended_actions": [
+    "Review authentication and audit logs to identify the destination host, targeted service/port, and usernames involved.",
+    "Check network and authentication logs for any successful logins from 192.0.2.10 around or after 2026-10-12T10:00:10.",
+    "Verify the ownership and role of IP 192.0.2.10 (e.g., internal host, known partner, or test IP range).",
+    "Monitor the source IP for further connection attempts or potential escalation.",
+    "Apply standard temporary rate-limiting or firewall blocks only if activity continues and violates security thresholds."
+  ],
+  "limitations": [
+    "The targeted service, application, or protocol is not specified.",
+    "Targeted usernames or account identifiers are not provided.",
+    "The destination IP address and port are unknown.",
+    "There is no log data indicating whether any subsequent attempts succeeded or failed."
+  ]
+}
