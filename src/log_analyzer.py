@@ -5,6 +5,7 @@ from pathlib import Path
 from detection import (
     analyze_logs,
     detect_success_after_failures,
+    detect_account_lockouts,
 )
 
 
@@ -31,6 +32,9 @@ sequence_alerts = detect_success_after_failures(
     window_minutes=window_minutes,
 )
 
+# Rule 3: Windows account lockouts.
+lockout_alerts = detect_account_lockouts(log_file)
+
 report_file.parent.mkdir(parents=True, exist_ok=True)
 
 fields = [
@@ -39,6 +43,8 @@ fields = [
     "first_seen",
     "last_seen",
     "success_time",
+    "timestamp",
+    "username",
     "status",
     "rule",
 ]
@@ -72,12 +78,26 @@ with report_file.open(
             "rule": alert["rule"],
         })
 
+    for alert in lockout_alerts:
+        writer.writerow({
+            "source_ip": alert["source_ip"],
+            "failed_attempts": "",
+            "first_seen": "",
+            "last_seen": "",
+            "success_time": "",
+            "timestamp": alert["timestamp"],
+            "username": alert["username"],
+            "status": alert["status"],
+            "rule": alert["rule"],
+        })
+
 print("Authentication Log Analysis")
 print("-" * 30)
 print(f"Detection window: {window_minutes} minutes")
 print(f"Failure threshold: {threshold} attempts")
 print(f"Repeated-failure alerts: {len(failure_alerts)}")
 print(f"Failure-then-success alerts: {len(sequence_alerts)}")
+print(f"Account-lockout alerts: {len(lockout_alerts)}")
 
 for ip, details in failure_alerts.items():
     print(
@@ -92,7 +112,7 @@ for alert in sequence_alerts:
         f"login at {alert['success_time']}"
     )
 
-if not failure_alerts and not sequence_alerts:
+if not failure_alerts and not sequence_alerts and not lockout_alerts:
     print("No alerts detected.")
 
 print(f"\nReport saved to: {report_file}")

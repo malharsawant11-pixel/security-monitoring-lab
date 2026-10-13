@@ -1,2 +1,3 @@
-source_ip,failed_attempts,first_seen,last_seen,success_time,status,rule
-192.0.2.10,3,2026-10-12T10:00:00,2026-10-12T10:00:10,,ALERT,REPEATED_FAILED_LOGINS
+source_ip,failed_attempts,first_seen,last_seen,success_time,timestamp,username,status,rule
+192.0.2.10,3,2026-10-12T10:00:00,2026-10-12T10:00:10,,,,ALERT,REPEATED_FAILED_LOGINS
+192.0.2.10,,,,,2026-10-12T10:02:00,testuser,INVESTIGATE,ACCOUNT_LOCKOUT

@@ -1,3 +1,4 @@
+from src.detection import detect_account_lockouts
 from src.detection import detect_success_after_failures
 import tempfile
 import unittest
@@ -105,6 +106,28 @@ class TestLogAnalyzer(unittest.TestCase):
         self.assertIn("192.0.2.10", failures)
         self.assertEqual(len(sequence), 1)
         self.assertEqual(sequence[0]["status"], "INVESTIGATE")
+
+
+    def test_account_lockout_event_is_detected(self):
+        self.write_logs([
+            ("2026-10-12T10:00:00", "192.0.2.10", "4740"),
+        ])
+
+        result = detect_account_lockouts(self.log_file)
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["username"], "testuser")
+        self.assertEqual(result[0]["rule"], "ACCOUNT_LOCKOUT")
+        self.assertEqual(result[0]["status"], "INVESTIGATE")
+
+    def test_unrelated_event_is_not_a_lockout(self):
+        self.write_logs([
+            ("2026-10-12T10:00:00", "192.0.2.10", "4625"),
+        ])
+
+        result = detect_account_lockouts(self.log_file)
+
+        self.assertEqual(result, [])
 
 
 if __name__ == "__main__":

@@ -108,3 +108,32 @@ def detect_success_after_failures(
                 break
 
     return alerts
+
+
+def detect_account_lockouts(log_file):
+    """Detect Windows account lockout events (Event ID 4740)."""
+    alerts = []
+
+    with Path(log_file).open(
+        newline="", encoding="utf-8"
+    ) as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            if row.get("event_id") != "4740":
+                continue
+
+            try:
+                timestamp = datetime.fromisoformat(row["timestamp"])
+            except (ValueError, KeyError, TypeError):
+                continue
+
+            alerts.append({
+                "timestamp": timestamp.isoformat(),
+                "username": row.get("username") or "unknown",
+                "source_ip": row.get("source_ip") or "unknown",
+                "status": "INVESTIGATE",
+                "rule": "ACCOUNT_LOCKOUT",
+            })
+
+    return alerts
