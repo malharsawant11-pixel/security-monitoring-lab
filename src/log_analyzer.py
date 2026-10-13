@@ -43,8 +43,14 @@ fields = [
     "rule",
 ]
 
-with report_file.open("w", newline="", encoding="utf-8") as file:
-    writer = csv.DictWriter(file, fieldnames=fields)
+with report_file.open(
+    "w", newline="", encoding="utf-8"
+) as file:
+    writer = csv.DictWriter(
+    file,
+    fieldnames=fields,
+    lineterminator="\n",
+)
     writer.writeheader()
 
     for ip, details in failure_alerts.items():
