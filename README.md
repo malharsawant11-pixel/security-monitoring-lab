@@ -58,6 +58,7 @@ security-monitoring-lab/
 4. Apply the configured threshold and time window.
 5. Generate alerts when the detection conditions are met.
 6. Export alert details to a CSV report.
+7. Account Lockout Detection (Event ID 4740): Detects Windows account-lockout events and generates investigation alerts containing the event timestamp, username, and source identifier.
 
 The sample configuration uses a threshold of three failed attempts within five minutes.
 
