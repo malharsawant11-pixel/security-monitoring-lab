@@ -163,6 +163,13 @@ if search:
     ).any(axis=1)
     filtered = filtered[mask]
 
+st.download_button(
+    label="Download Filtered Alerts as CSV",
+    data=filtered.to_csv(index=False).encode("utf-8"),
+    file_name="security_alerts.csv",
+    mime="text/csv",
+)
+
 st.dataframe(
     filtered,
     use_container_width=True,
