@@ -16,6 +16,9 @@ The project was developed and tested in Kali Linux.
 - **AI-Powered Alert Investigation:** Integrates Google's Gemini API to explain alerts and produce structured investigation reports.
 - **Structured JSON Reports:** Generates explanations containing observed facts, possible explanations, recommended actions, and limitations.
 - **CSV Alert Reporting:** Exports detected alerts for further investigation.
+- **Interactive Security Dashboard:** Displays alert metrics, detection-rule charts, severity filtering, and time-based alert trends.
+- **Filtered CSV Export:** Allows analysts to download alerts matching the selected severity and search criteria.
+- **Account Lockout Detection:** Identifies Windows Event ID `4740` in the supplied authentication logs.
 - **Automated Testing:** Includes unit tests for detection logic, report generation, and mocked LLM responses.
 
 ## Technologies Used
@@ -27,6 +30,8 @@ The project was developed and tested in Kali Linux.
 - CSV and JSON processing
 - Git and GitHub
 - Python `unittest`
+- Streamlit
+- Pandas
 
 ## Project Structure
 
@@ -45,7 +50,7 @@ security-monitoring-lab/
 │   └── ai_alert_explainer.py
 ├── tests/
 │   ├── test_log_analyzer.py
-│   └── test_ai_alert_explainer.py
+├── dashboard.py│   └── test_ai_alert_explainer.py
 ├── .gitignore
 └── README.md
 ```
@@ -140,7 +145,15 @@ Execute the test suite:
 python -m unittest discover -s tests -v
 ```
 
-**Current test coverage: 6 unit tests passing**, covering the existing detection logic, investigation request construction, JSON report saving, and mocked Gemini responses.
+**Current test suite: 11 tests passing**, covering authentication detection, account-lockout detection, investigation workflows, and mocked LLM responses.
+
+Run the tests with:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+
 
 The LLM unit test mocks the API client and does not require a live API request.
 
