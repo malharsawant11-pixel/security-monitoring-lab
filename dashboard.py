@@ -103,6 +103,39 @@ with right:
     )
     st.bar_chart(status_counts)
 
+
+st.divider()
+st.subheader("Alert Trends Over Time")
+
+# Select the best available timestamp for each alert.
+df["event_time"] = df["timestamp"].replace("", pd.NA)
+
+if "first_seen" in df.columns:
+    df["event_time"] = df["event_time"].fillna(
+        df["first_seen"].replace("", pd.NA)
+    )
+
+df["event_time"] = pd.to_datetime(
+    df["event_time"], errors="coerce"
+)
+
+trend_data = df.dropna(subset=["event_time"]).copy()
+
+if trend_data.empty:
+    st.info("No valid timestamps are available for the trend chart.")
+else:
+    trend_data["hour"] = (
+        trend_data["event_time"].dt.floor("h")
+    )
+
+    hourly_alerts = (
+        trend_data.groupby("hour")
+        .size()
+        .rename("Alert Count")
+    )
+
+    st.line_chart(hourly_alerts)
+
 st.divider()
 st.subheader("Alert Investigation Table")
 
